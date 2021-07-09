@@ -1,4 +1,4 @@
-package com.example.mouseclicktest;
+package com.wsandst.mouseapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,9 +7,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.mouseapp.R;
+
 public class MouseActivity extends AppCompatActivity {
 
     MouseClickHelper mouse = new MouseClickHelper();
+
+    BluetoothHandler bluetoothHandler = new BluetoothHandler();
 
     void leftMouseClick() {
         Log.d("mouse", "Left mouse button clicked");
@@ -28,6 +32,7 @@ public class MouseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mouse);
 
+        // Setup mouse buttons
         View palmView = (View) findViewById(R.id.palmView);
         palmView.setFocusable(false);
         palmView.setFocusableInTouchMode(false);
@@ -88,5 +93,11 @@ public class MouseActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bluetoothHandler.onStart(this);
     }
 }

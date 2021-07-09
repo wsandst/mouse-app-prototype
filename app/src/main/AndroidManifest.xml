@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mouseclicktest">
+    package="com.example.mouseapp">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="true"/>
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false"/>
 
     <application
         android:allowBackup="true"
@@ -9,7 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MouseClickTest">
-        <activity android:name=".MouseActivity">
+        <activity android:name="com.wsandst.mouseapp.MouseActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

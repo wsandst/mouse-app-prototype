@@ -1,4 +1,4 @@
-package com.example.mouseclicktest;
+package com.wsandst.mouseapp;
 
 import android.util.Log;
 

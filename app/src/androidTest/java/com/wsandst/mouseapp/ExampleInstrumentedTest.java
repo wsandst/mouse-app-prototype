@@ -1,4 +1,4 @@
-package com.example.mouseclicktest;
+package com.example.mouseapp;
 
 import android.content.Context;
 
