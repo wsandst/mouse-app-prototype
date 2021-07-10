@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.mouseapp.R;
 import com.wsandst.mouseapp.bluetooth.senders.RelativeMouseSender;
@@ -48,6 +49,9 @@ public class MouseActivity extends AppCompatActivity {
         View rightClickView = (View) findViewById(R.id.rightClickView);
 
         mouseButtonsListener = new MouseButtonsListener(bluetoothHandler.getRMouseSender(), leftClickView, rightClickView);
+        // Disable loading icon
+        ProgressBar bluetoothLoadingBar = findViewById(R.id.bluetoothLoadingBar);
+        bluetoothLoadingBar.setVisibility(View.GONE);
         return null;
     }
 
