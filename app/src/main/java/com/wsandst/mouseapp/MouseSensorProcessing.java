@@ -41,6 +41,9 @@ public class MouseSensorProcessing {
     private double yVelocityStopTime = 0;
     private double airStopTime = 0;
 
+    private double prevXVelocity;
+    private double prevYVelocity;
+
 
     void updateAcceleration(float[] accData) {
         long timestamp = System.nanoTime();
@@ -56,10 +59,11 @@ public class MouseSensorProcessing {
         if (accelerationData.size() > 1) {
             updateVelocity();
         }
-        accelerationData.add(datapoint);
         prevTime = timestamp;
     }
 
+    // Update the velocity based on the new acceleration data point
+    // Integrates the acceleration and applies various cutoff strategies
     void updateVelocity() {
         if (Double.isNaN(xVelocity)) {
             xVelocity = 0;
@@ -69,17 +73,18 @@ public class MouseSensorProcessing {
         }
         // Trapezoid integration for velocity
         DataPoint curPoint = accelerationData.get(accelerationData.size()-1);
-        //DataPoint prevPoint = accelerationData.get(accelerationData.size()-2);
+        DataPoint prevPoint = accelerationData.get(accelerationData.size()-2);
 
         double dT = curPoint.dT;
 
         if (curPoint.t - airStopTime > Z_AIR_CUTOFF_DUR) {
             if (curPoint.t - xVelocityStopTime > SIGN_CHANGE_CUTOFF_DUR) {
                 double prevVelocityX = xVelocity;
-                xVelocity += dT * curPoint.x;
-                //xVelocity += dT * 0.5 * (prevPoint.x + curPoint.x);
+                //xVelocity += dT * curPoint.x;
+                xVelocity += dT * 0.5 * (prevPoint.x + curPoint.x);
 
-                // Check if xVelocity changed sign
+                // Stop the x velocity momentarily if it changes sign
+                // This prevents kickback
                 if (prevVelocityX * xVelocity < 0) {
                     xVelocityStopTime = curPoint.t;
                     xVelocity = 0;
@@ -88,10 +93,11 @@ public class MouseSensorProcessing {
 
             if (curPoint.t - yVelocityStopTime > SIGN_CHANGE_CUTOFF_DUR) {
                 double prevVelocityY = yVelocity;
-                yVelocity += dT * curPoint.y;
-                //yVelocity += dT * 0.5 * (prevPoint.y + curPoint.y);
+                //yVelocity += dT * curPoint.y;
+                yVelocity += dT * 0.5 * (prevPoint.y + curPoint.y);
 
-                // Check if xVelocity changed sign
+                // Stop the y velocity momentarily if it changes sign
+                // This prevents kickback
                 if (prevVelocityY * yVelocity < 0) {
                     yVelocityStopTime = curPoint.t;
                     yVelocity = 0;
@@ -99,15 +105,15 @@ public class MouseSensorProcessing {
             }
         }
 
-        // Set velocity to 0 if standard deviation is too low
         //applyStandardDevCutoff();
         applyAccelerationCutoff();
         applyAirCutoff();
 
-        Log.d("sensor", String.format("Velocity: (%.4f, %.4f), dT: (%s)", xVelocity, yVelocity, dT));
-        Log.d("sensor", String.format("Acceleration: (%.4f, %.4f, %.4f), dT: (%s)", curPoint.x, curPoint.y, curPoint.z, dT));
+        //Log.d("sensor", String.format("Velocity: (%.4f, %.4f), dT: (%s)", xVelocity, yVelocity, dT));
+        //Log.d("sensor", String.format("Acceleration: (%.4f, %.4f, %.4f), dT: (%s)", curPoint.x, curPoint.y, curPoint.z, dT));
     }
 
+    // Hold the velocity at 0 if the phone is in the air
     void applyAirCutoff() {
         DataPoint curPoint = accelerationData.get(accelerationData.size()-1);
         if (curPoint.z > Z_AIR_CUTOFF) {
@@ -117,6 +123,8 @@ public class MouseSensorProcessing {
         }
     }
 
+    // Set the velocity if the standard deviation (variance) of the accelerations is too low
+    // Actual movements should have a large standard deviation
     void applyStandardDevCutoff() {
         DataPoint currentPoint = accelerationData.get(currentPointIndex);
         DataPoint lastPoint = accelerationData.get(accelerationData.size()-1);
@@ -153,6 +161,8 @@ public class MouseSensorProcessing {
         }
     }
 
+    // Set the velocity to 0 if the acceleration is too low
+    // Similar effect to standard deviation cutoff
     void applyAccelerationCutoff() {
         if (accelerationData.size() < 2) {
             return;

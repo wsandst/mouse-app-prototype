@@ -54,8 +54,10 @@ public class MouseSensorListener extends AppCompatActivity {
     void sendMouseMoveByBluetooth() {
         int x = (int) (sensorProcessing.getVelocityX() * 300);
         int y = (int) (sensorProcessing.getVelocityY() * 300);
-        Log.i("mouse", String.format("Sending mouse move %s %s", x, y));
-        rMouseSender.sendMove(x, -y);
+        if (x != 0 || y != 0) {
+            Log.i("mouse", String.format("Sending mouse move %s %s", x, y));
+            rMouseSender.sendMove(x, -y);
+        }
     }
 
     @Override
