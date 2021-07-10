@@ -21,7 +21,7 @@ public class MouseButtonsListener {
         CLASSIC_FAST_AND_DRAG // DRAG and CLASSIC_FAST combined. Logical but still allows for non-logical dragging
     }
 
-    public ClickBehaviour clickBehaviour = ClickBehaviour.CLASSIC_FAST_AND_DRAG;
+    public ClickBehaviour clickBehaviour = ClickBehaviour.CLASSIC;
 
     public boolean rightButtonPressed = false;
     public boolean leftButtonPressed = false;

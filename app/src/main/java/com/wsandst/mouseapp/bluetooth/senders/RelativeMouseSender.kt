@@ -4,8 +4,10 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHidDevice
 import android.util.Log
 import com.wsandst.mouseapp.reports.ScrollableTrackpadMouseReport
+import java.nio.ByteBuffer
 import java.util.*
 import kotlin.concurrent.schedule
+import kotlin.math.roundToInt
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class RelativeMouseSender(
@@ -26,6 +28,24 @@ open class RelativeMouseSender(
         if( !hidDevice.sendReport(host, ScrollableTrackpadMouseReport.ID, mouseReport.bytes) ) {
             Log.e("RelativeMouseSender", "Report wasn't sent")
         }
+    }
+
+    fun sendMove(x: Int, y: Int) {
+        val dx = x.coerceIn(-2047, 2047)
+        val dy = y.coerceIn(-2047, 2047)
+
+        var bytesArrX = ByteArray(2) { 0 }
+        ByteBuffer.wrap(bytesArrX).putShort(dx.toShort())
+
+        var bytesArrY = ByteArray(2) { 0 }
+        ByteBuffer.wrap(bytesArrY).putShort(dy.toShort())
+
+        mouseReport.dxMsb = bytesArrX[0]
+        mouseReport.dxLsb = bytesArrX[1]
+        mouseReport.dyMsb = bytesArrY[0]
+        mouseReport.dyLsb = bytesArrY[1]
+
+        sendMouse();
     }
 
     fun sendLeftClick() {

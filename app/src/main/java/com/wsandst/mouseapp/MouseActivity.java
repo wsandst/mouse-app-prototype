@@ -18,6 +18,7 @@ import kotlin.Unit;
 public class MouseActivity extends AppCompatActivity {
 
     MouseButtonsListener mouseButtonsListener;
+    MouseSensorListener mouseSensorListener;
 
     BluetoothHandler bluetoothHandler = new BluetoothHandler();
 
@@ -49,6 +50,7 @@ public class MouseActivity extends AppCompatActivity {
         View rightClickView = (View) findViewById(R.id.rightClickView);
 
         mouseButtonsListener = new MouseButtonsListener(bluetoothHandler.getRMouseSender(), leftClickView, rightClickView);
+        mouseSensorListener = new MouseSensorListener(this, bluetoothHandler.getRMouseSender());
         // Disable loading icon
         ProgressBar bluetoothLoadingBar = findViewById(R.id.bluetoothLoadingBar);
         bluetoothLoadingBar.setVisibility(View.GONE);
