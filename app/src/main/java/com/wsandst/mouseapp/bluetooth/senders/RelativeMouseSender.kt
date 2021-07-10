@@ -24,49 +24,19 @@ open class RelativeMouseSender(
     protected open fun sendMouse() {
         Log.i("RelativeMouseSender", "sendMouse")
         if( !hidDevice.sendReport(host, ScrollableTrackpadMouseReport.ID, mouseReport.bytes) ) {
-            Log.e(TAG, "Report wasn't sent")
+            Log.e("RelativeMouseSender", "Report wasn't sent")
         }
     }
 
-    fun sendTestMouseMove() {
-        Log.i("RelativeMouseSender", "sendTestMouseMove")
-        mouseReport.dxLsb = 20
-        mouseReport.dyLsb = 20
-        mouseReport.dxMsb = 20
-        mouseReport.dyMsb = 20
-        sendMouse()
-    }
-
-    fun sendTestClick() {
-        Log.i("RelativeMouseSender", "sendTestClick")
+    fun sendLeftClick() {
+        Log.i("RelativeMouseSender", "sendLeftClick")
         mouseReport.leftButton = true
         sendMouse()
-        mouseReport.leftButton = false
-        sendMouse()
-//        Timer().schedule(20L) {
-//
-//        }
-    }
-
-    fun sendDoubleTapClick() {
-        Log.i("RelativeMouseSender", "sendDoubleTapClick")
-        mouseReport.leftButton = true
-        sendMouse()
-        Timer().schedule(100L) {
+        Timer().schedule(50L) {
             mouseReport.leftButton = false
             sendMouse()
-            Timer().schedule(100L) {
-                mouseReport.leftButton = true
-                sendMouse()
-                Timer().schedule(100L) {
-                    mouseReport.leftButton = false
-                    sendMouse()
-                }
-            }
         }
     }
-
-
 
     fun sendLeftClickOn() {
         Log.i("RelativeMouseSender", "sendLeftClickOn")
@@ -89,6 +59,19 @@ open class RelativeMouseSender(
             mouseReport.rightButton= false
             sendMouse()
         }
+    }
+
+    fun sendRightClickOn() {
+        Log.i("RelativeMouseSender", "sendRightClickOn")
+        mouseReport.rightButton = true
+        sendMouse()
+    }
+
+    fun sendRightClickOff() {
+        Log.i("RelativeMouseSender", "sendRightClickOff")
+        mouseReport.rightButton = false
+        sendMouse()
+
     }
 
     fun sendScroll(vscroll:Int,hscroll:Int){
@@ -127,8 +110,24 @@ open class RelativeMouseSender(
 //      previoushscroll=hscroll
     }
 
-    companion object {
-        const val TAG = "TrackPadSender"
+    fun sendTestMouseMove() {
+        Log.i("RelativeMouseSender", "sendTestMouseMove")
+        mouseReport.dxLsb = 20
+        mouseReport.dyLsb = 20
+        mouseReport.dxMsb = 20
+        mouseReport.dyMsb = 20
+        sendMouse()
+    }
+
+    fun sendTestClick() {
+        Log.i("RelativeMouseSender", "sendTestClick")
+        mouseReport.leftButton = true
+        sendMouse()
+        mouseReport.leftButton = false
+        sendMouse()
+//        Timer().schedule(20L) {
+//
+//        }
     }
 
 }

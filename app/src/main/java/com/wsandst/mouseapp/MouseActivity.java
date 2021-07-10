@@ -2,102 +2,53 @@ package com.wsandst.mouseapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothHidDevice;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.mouseapp.R;
+import com.wsandst.mouseapp.bluetooth.senders.RelativeMouseSender;
+
+import kotlin.Unit;
 
 public class MouseActivity extends AppCompatActivity {
 
-    MouseClickHelper mouse = new MouseClickHelper();
+    MouseButtonsListener mouseButtonsListener;
 
     BluetoothHandler bluetoothHandler = new BluetoothHandler();
-
-    void leftMouseClick() {
-        Log.d("mouse", "Left mouse button clicked");
-    }
-
-    void rightMouseClick() {
-        Log.d("mouse", "Right mouse button clicked");
-    }
-
-    void mouseScroll(int amount) {
-        Log.d("mouse", String.format("Mouse scrolled %s amount", amount));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mouse);
 
-        // Setup mouse buttons
+        // Ignore all touches in the palm area
         View palmView = (View) findViewById(R.id.palmView);
         palmView.setFocusable(false);
         palmView.setFocusableInTouchMode(false);
         palmView.setClickable(false);
-
-        View leftClickView = (View) findViewById(R.id.leftClickView);
-        leftClickView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                float x = event.getX();
-                float y = event.getY();
-                switch(event.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                        mouse.touchLeftButtonUp(x, y);
-                        break;
-                    case MotionEvent.ACTION_DOWN:
-                        mouse.touchLeftButtonDown(x, y);
-                        break;
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                        mouse.touchLeftButtonDown(x, y);
-                        break;
-                    case MotionEvent.ACTION_POINTER_UP:
-                        //mouse.touchLeftButtonUp(x, y);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        mouse.touchLeftButtonMove(x, y);
-                        break;
-                }
-                return true;
-            }
-        });
-
-
-        View rightClickView = (View) findViewById(R.id.rightClickView);
-        rightClickView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                float x = event.getX();
-                float y = event.getY();
-                switch(event.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                        mouse.touchRightButtonUp(x, y);
-                        break;
-                    case MotionEvent.ACTION_DOWN:
-                        mouse.touchRightButtonDown(x, y);
-                        break;
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                        mouse.touchRightButtonDown(x, y);
-                        break;
-                    case MotionEvent.ACTION_POINTER_UP:
-                        //mouse.touchRightButtonUp(x, y);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        mouse.touchRightButtonMove(x, y);
-                        break;
-                }
-                return true;
-            }
-        });
-
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
-        bluetoothHandler.onStart(this);
+        // Start the bluetooth. This will call onBluetoothConnectionEstablished once finished
+        // Takes quite some time, ~5s. Can this be improved?
+        // TODO: Add visual indicator for bluetooth connection loading
+        bluetoothHandler.onStart(this, this::onBluetoothConnectionEstablished);
     }
+
+    // Callback from BluetoothHandler
+    protected Unit onBluetoothConnectionEstablished() {
+        View leftClickView = (View) findViewById(R.id.leftClickView);
+        View rightClickView = (View) findViewById(R.id.rightClickView);
+
+        mouseButtonsListener = new MouseButtonsListener(bluetoothHandler.getRMouseSender(), leftClickView, rightClickView);
+        return null;
+    }
+
 }
